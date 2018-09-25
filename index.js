@@ -3,15 +3,18 @@ document.addEventListener("DOMContentLoaded",()=>{
    const monsterForm=document.getElementById('add-monster-form')
    const back =document.getElementById('back')
    const forward=document.getElementById('forward')
-   let start=0
-   let end =50
-   fetch("http://localhost:3000/monsters").then(
+   let counter=1
+   const renderAll=()=>{
+     fetch(`http://localhost:3000/monsters/?_limit=50&_page=${counter}`).then(
      response=>response.json()
-   ).then(obj=>obj.map(monsterobj=>{
-     new Monster(monsterobj)
-   })).then(()=>{
-   monsterRender.innerHTML=allMonsters.slice(start,end).map(monster=>monster.render()).join("")
- })
+   ).then(obj=>
+         {monsterRender.innerHTML=obj.map(monsterobj=>{
+         const monster=new Monster(monsterobj)
+         return monster.render()
+       }).join("")
+   })}
+
+   renderAll()
 
  monsterForm.addEventListener('submit',e=>{
    e.preventDefault()
@@ -29,19 +32,13 @@ document.addEventListener("DOMContentLoaded",()=>{
 })//create new monster
 
   forward.addEventListener("click",e=>{
-    start+=50
-    end+=50
-    if (end<allMonsters.length) {
-      monsterRender.innerHTML=allMonsters.slice(start,end).map(monster=>monster.render()).join("")
-    }
+    counter+=1
+    renderAll()
   })
 
  back.addEventListener("click",e=>{
-   start-=50
-   end-=50
-   if (start>0) {
-     monsterRender.innerHTML=allMonsters.slice(start,end).map(monster=>monster.render()).join("")
-   }
+   counter-=1
+   renderAll()
  })
 
 })
